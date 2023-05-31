@@ -117,7 +117,7 @@ async function getDocument(text, url) {
   handleText(url, text, documents);
 
   if (documents.length === 0) {
-    return { error: 'Document array is empty' };
+    return { error: 'No captions found in the video.' };
   }
 
   return documents;
