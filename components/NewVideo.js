@@ -110,13 +110,7 @@ const NewVideo = ({ setTitle, setSummary }) => {
         </h1>
         <div className='max-w-xl w-full'>
           <div className='flex mt-10 items-center space-x-3'>
-            <Image
-              src='/1-black.png'
-              width={30}
-              height={30}
-              alt='1 icon'
-              className='mb-5 sm:mb-0'
-            />
+            <Image src='/1-black.png' width={30} height={30} alt='1 icon' />
             <p className='text-left font-medium'>
               Paste link to the YouTube video in the box below
             </p>
@@ -131,13 +125,7 @@ const NewVideo = ({ setTitle, setSummary }) => {
             />
           </div>
           <div className='flex mt-10 items-center space-x-3'>
-            <Image
-              src='/2-black.png'
-              width={30}
-              height={30}
-              alt='1 icon'
-              className='mb-5 sm:mb-0'
-            />
+            <Image src='/2-black.png' width={30} height={30} alt='1 icon' />
             <p className='text-left font-medium'>Select summary length</p>
           </div>
           <div className='block mt-4'>
