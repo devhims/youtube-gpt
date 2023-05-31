@@ -6,31 +6,25 @@ import Image from 'next/image';
 import Header from './Header';
 import Footer from './Footer';
 import DropDown from './Dropdown';
+import LoadingDots from './LoadingDots';
 
 import { extractVideoId } from '@/utils/helpers';
 
-const YoutubeCaptions = () => {
-  const [videoId, setVideoId] = useState(null);
-  const [transcript, setTranscript] = useState('');
-  const [videoInfo, setVideoInfo] = useState(null);
+const NewVideo = ({ setTitle, setSummary }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
   const [count, setCount] = useState('1 sentence');
   const [videoURL, setVideoURL] = useState('');
-  const [summary, setSummary] = useState('');
 
-  const createEmbeddings = async (text, url) => {
+  const createEmbeddings = async (id) => {
     try {
       const response = await fetch('/api/create-embeddings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, url }),
+        body: JSON.stringify({ videoID: id }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        setApiErrorMessage(data.message);
         return toast.error(data.message || 'Request failed');
       }
     } catch (error) {
@@ -40,20 +34,15 @@ const YoutubeCaptions = () => {
     }
   };
 
-  // Update processEmbeddings function to accept transcript and videoId as arguments
-  const processEmbeddings = useCallback(
-    async (transcript, videoId) => {
-      await createEmbeddings(transcript, videoId);
-    },
-    [transcript, videoId]
-  );
+  const getTitle = async (videoId) => {
+    const res = await fetch(`/api/video-info?videoID=${videoId}`);
+    const data = await res.json();
+    setTitle(data.title);
+    return data.title;
+  };
 
   const generateSummary = async (url) => {
-    setSummary('');
     setIsLoading(true);
-
-    let fetchedVideoInfo;
-    let transcriptString;
 
     const videoId = extractVideoId(url);
     if (!videoId) {
@@ -63,7 +52,15 @@ const YoutubeCaptions = () => {
 
     console.log('videoId: ', videoId);
 
-    const response = await fetch(`/api/summary?videoId=${videoId}`);
+    // Create embeddings
+    createEmbeddings(videoId);
+
+    const title = await getTitle(videoId);
+    console.log('title: ', title);
+
+    const response = await fetch(
+      `/api/summary?videoId=${videoId}&count=${count}`
+    );
 
     console.log('Edge function returned.');
 
@@ -86,65 +83,7 @@ const YoutubeCaptions = () => {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
-      setAnswer((prev) => prev + chunkValue);
-    }
-
-    setIsLoading(false);
-  };
-
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-
-    let fetchedVideoInfo;
-    let transcriptString;
-    const videoId = extractVideoId(videoURL);
-    if (!videoId) {
-      setIsLoading(false);
-      return null;
-    }
-
-    try {
-      setVideoId(videoId);
-      const captionsResponse = await fetch(`/api/captions?videoId=${videoId}`);
-      const fetchedCaptions = await captionsResponse.json();
-
-      transcriptString = fetchedCaptions
-        .map((caption) => caption.text.replace(/\n/g, ' ').trim())
-        .filter((text) => text)
-        .join(', ');
-
-      setTranscript(transcriptString);
-
-      const videoInfoResponse = await fetch(
-        `/api/video-info?videoID=${videoId}`
-      );
-      fetchedVideoInfo = await videoInfoResponse.json();
-      setVideoInfo(fetchedVideoInfo);
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-    }
-
-    setIsLoading(false);
-
-    return {
-      title: fetchedVideoInfo.title,
-      description: fetchedVideoInfo.description,
-      transcript: transcriptString,
-      videoId: videoId,
-    };
-  }, [videoURL]);
-
-  const fetchDataOnClick = async (e) => {
-    setIsLoading(true);
-    const fetchedData = await fetchData();
-
-    if (fetchedData) {
-      await generateSummary(
-        fetchedData.title,
-        fetchedData.description,
-        fetchedData.transcript
-      );
-      // await processEmbeddings(fetchedData.transcript, fetchedData.videoId);
+      setSummary((prev) => prev + chunkValue);
     }
 
     setIsLoading(false);
@@ -200,13 +139,24 @@ const YoutubeCaptions = () => {
             />
           </div>
           <div className='w-full mx-auto mt-6'>
-            <button
-              className='w-full px-4 py-3 bg-black text-white rounded-lg text-lg hover:bg-black/80 transition-colors'
-              type='button'
-              onClick={() => generateSummary(videoURL)}
-            >
-              Generate Summary
-            </button>
+            {!isLoading && (
+              <button
+                className='w-full px-4 py-3 bg-black text-white rounded-lg text-lg hover:bg-black/80 transition-colors'
+                type='button'
+                onClick={() => generateSummary(videoURL)}
+              >
+                Generate Summary
+              </button>
+            )}
+            {isLoading && (
+              <button
+                className='w-full px-4 py-3 bg-black text-white rounded-lg text-lg hover:bg-black/80 transition-colors'
+                type='button'
+                disabled
+              >
+                <LoadingDots color='white' style='large' />
+              </button>
+            )}
           </div>
         </div>
       </main>
@@ -215,4 +165,4 @@ const YoutubeCaptions = () => {
   );
 };
 
-export default YoutubeCaptions;
+export default NewVideo;

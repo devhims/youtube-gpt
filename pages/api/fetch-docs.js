@@ -26,11 +26,14 @@ const handler = async (req) => {
   const data = await req.json();
   const question = data.question;
 
-  console.log('question: ', question);
+  const summary = data.summary;
 
-  //   if (!question) {
-  //     return new Response('No prompt in the request', { status: 400 });
-  //   }
+  console.log('question: ', question);
+  console.log('summary: ', summary);
+
+  if (!question) {
+    return new Response('No prompt in the request', { status: 400 });
+  }
 
   const query = question;
 
@@ -74,6 +77,7 @@ const handler = async (req) => {
   let tokenCount = 0;
   let contextText = '';
 
+  contextText += summary;
   console.log('documents: ', documents);
 
   // Concat matched documents
@@ -93,21 +97,19 @@ const handler = async (req) => {
         break;
       }
 
-      contextText += `${content.trim()}\nSOURCE: ${url}\n---\n`;
+      contextText += content.trim();
     }
   }
 
   console.log('contextText: ', contextText);
 
-  const systemContent = `Create summary of youtube video in 100 words and answer user questions based on the title, description and transcript of the video. If you are unsure and the answer is not provided in the CONTEXT, you say, "Sorry, I don't know how to help with that."`;
+  const systemContent = `Answer user question based on the provided parts of the youtube video as text in the context. If you are unsure and the answer is not provided in the CONTEXT, you say, "Sorry, I don't know how to help with that."`;
 
   const userMessage = `CONTEXT:
   ${contextText}
   
   USER QUESTION: 
-  ${
-    query !== '' ? query : 'Summarize this youtube video trascript in 100 words'
-  }  
+  ${query}  
   `;
 
   const messages = [
@@ -128,6 +130,7 @@ const handler = async (req) => {
     messages: messages,
     temperature: 0.2,
     stream: true,
+    max_tokens: 200,
     n: 1,
   };
 

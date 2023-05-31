@@ -1,10 +1,15 @@
 import Head from 'next/head';
+import { useState } from 'react';
 // import YouTubeSubtitleViewer from '@/components/YouTubeSubtitleViewer';
 // import CaptionExtractor from '@/components/CaptionExtractor';
 import YoutubeCaptions from '@/components/YoutubeCaptions';
+import NewVideo from '@/components/NewVideo';
+import VideoChat from '@/components/VideoChat';
 
 export default function Home() {
   const videoURL = 'https://youtu.be/G8xSr7Q8MGY';
+  const [summary, setSummary] = useState('');
+  const [title, setTitle] = useState('');
 
   return (
     <>
@@ -15,18 +20,12 @@ export default function Home() {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <main>
-        {/* <YouTubeSubtitleViewer videoURL='https://youtu.be/R8mnOOuK85M' /> */}
-        {/* <CaptionExtractor /> */}
-
-        <YoutubeCaptions videoURL={videoURL} />
+        {title && summary ? (
+          <VideoChat title={title} summary={summary} />
+        ) : (
+          <NewVideo setTitle={setTitle} setSummary={setSummary} />
+        )}
       </main>
     </>
   );
 }
-
-// export async function getServerSideProps(context) {
-//   const code = context.query.code;
-//   return {
-//     props: { code },
-//   };
-// }

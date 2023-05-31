@@ -1,4 +1,3 @@
-// pages/api/captions.js
 import { getSubtitles } from 'youtube-caption-extractor';
 
 export default async function handler(req, res) {

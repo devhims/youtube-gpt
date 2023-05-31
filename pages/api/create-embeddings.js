@@ -3,6 +3,7 @@ import count from 'word-count';
 import { OpenAIStream } from '@/utils/OpenAIStream';
 import GPT3Tokenizer from 'gpt3-tokenizer';
 import { Configuration, OpenAIApi } from 'openai';
+import { getSubtitles } from 'youtube-caption-extractor';
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,20 +14,27 @@ const openai = new OpenAIApi(configuration);
 // character chunk size
 const docSize = 5000;
 // max number of characters allowed
-const maxChars = 20000;
+const maxChars = 40000;
 // max number of words allowed
-const maxWords = 5000;
+const maxWords = 10000;
 
 export default async function handle(req, res) {
   const { method, body } = req;
 
   if (method === 'POST') {
-    const { text, videoID } = body;
+    const { videoID } = body;
 
     const url = `https://youtube.com/watch?v=${videoID}`;
 
     try {
-      const documents = await getDocument(text, url);
+      const captions = await getSubtitles({ videoID: videoID });
+
+      const transcript = captions
+        .map((caption) => caption.text.replace(/\n/g, ' ').trim())
+        .filter((text) => text)
+        .join(', ');
+
+      const documents = await getDocument(transcript, url);
 
       if (documents.error) {
         return res
