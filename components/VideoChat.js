@@ -1,83 +1,71 @@
 import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { MdSend } from 'react-icons/md';
 import Head from 'next/head';
 import Header from './Header';
 import Footer from './Footer';
 import ChatMessage from './ChatMessage';
 import LoadingDots from './LoadingDots';
-import MarkdownRenderer from './MarkdownRenderer';
-import ReactMarkdown from 'react-markdown';
 
+// This component renders a video chat interface
 const VideoChat = ({ title, summary }) => {
   const textAreaRef = useRef(null);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [answer, setAnswer] = useState('');
 
+  // Function to fetch answer from the server
   const getAnswer = async (question, callback) => {
-    const res = await fetch('/api/fetch-docs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, summary }),
-    });
+    try {
+      const res = await fetch('/api/get-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, summary }),
+      });
 
-    console.log('fetch docs returned.');
+      console.log('fetch docs returned.');
 
-    if (!res.ok) {
-      throw new Error(response.statusText);
-    }
+      if (!res.ok) throw new Error(res.statusText);
 
-    // This data is a ReadableStream
-    const data = res.body;
-    if (!data) {
-      console.log('No data returned.');
-      return;
-    }
+      // This data is a ReadableStream
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
 
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-    let answer = '';
+      // Initialise an empty answer
+      let answer = '';
 
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      answer += chunkValue;
-      callback(answer);
+      // Process stream and handle chunks of data
+      reader.read().then(function processStream({ done, value }) {
+        if (done) return;
+        const chunkValue = decoder.decode(value);
+        answer += chunkValue;
+        callback(answer);
+        return reader.read().then(processStream);
+      });
+    } catch (error) {
+      console.log('An error occurred', error);
     }
   };
 
+  // Handle the input changes
   const handleChange = (e) => {
     setInput(e.target.value);
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!input) return;
-
-    // Keep track of the user message ID
     const userMessageId = messages.length;
-
-    setMessages((prevMessages) => [
-      ...prevMessages,
+    setMessages([
+      ...messages,
       { id: userMessageId, role: 'user', content: input },
     ]);
-
     setInput('');
     setLoading(true);
-
     getAnswer(input, (newAnswerChunk) => {
-      // Keep track of the assistant message ID
       const assistantMessageId = userMessageId + 1;
-
-      setAnswer(newAnswerChunk);
-
-      // Update the messages list with the new assistant message
       setMessages((prevMessages) => {
-        // If the assistant message already exists, update it
         if (prevMessages.some((message) => message.id === assistantMessageId)) {
           return prevMessages.map((message) =>
             message.id === assistantMessageId
@@ -85,8 +73,6 @@ const VideoChat = ({ title, summary }) => {
               : message
           );
         }
-
-        // If it doesn't exist yet, add it
         return [
           ...prevMessages,
           {
@@ -96,29 +82,21 @@ const VideoChat = ({ title, summary }) => {
           },
         ];
       });
-
-      // Set loading to false as soon as the first chunk comes in
       setLoading(false);
     });
   };
 
   useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = '40px';
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
-    }
-  }, [input]);
-
-  useEffect(() => {
+    // Handling enter key press
     const handleKeyDown = (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         handleSubmit(e);
       }
     };
-
     document.addEventListener('keydown', handleKeyDown);
 
+    // Cleaning up the event listener
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
@@ -177,6 +155,11 @@ const VideoChat = ({ title, summary }) => {
       <Footer />
     </div>
   );
+};
+
+VideoChat.propTypes = {
+  title: PropTypes.string.isRequired,
+  summary: PropTypes.string.isRequired,
 };
 
 export default VideoChat;

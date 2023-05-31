@@ -19,7 +19,7 @@ export default function Header() {
       </Link>
       <a
         className='flex items-center justify-center max-w-fit space-x-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600 shadow-md transition-colors hover:bg-gray-100'
-        href='https://github.com/your-repo'
+        href='https://github.com/devhims/youtube-gpt'
         target='_blank'
         rel='noopener noreferrer'
       >

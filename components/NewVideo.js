@@ -1,6 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
-import Head from 'next/head';
 import Image from 'next/image';
 
 import Header from './Header';
@@ -15,6 +14,7 @@ const NewVideo = ({ setTitle, setSummary }) => {
   const [count, setCount] = useState('1 sentence');
   const [videoURL, setVideoURL] = useState('');
 
+  // Function to fetch and create embeddings from the server
   const createEmbeddings = async (id) => {
     try {
       const response = await fetch('/api/create-embeddings', {
@@ -34,6 +34,7 @@ const NewVideo = ({ setTitle, setSummary }) => {
     }
   };
 
+  // Function to fetch the video title from the server
   const getTitle = async (videoId) => {
     const res = await fetch(`/api/video-info?videoID=${videoId}`);
     const data = await res.json();
@@ -41,13 +42,17 @@ const NewVideo = ({ setTitle, setSummary }) => {
     return data.title;
   };
 
+  // Function to generate a video summary
   const generateSummary = async (url) => {
     setIsLoading(true);
 
     const videoId = extractVideoId(url);
+    // If the video ID is null, this isn't a YouTube video.
     if (!videoId) {
       setIsLoading(false);
-      return null;
+      // Display a toast error to the user
+      toast.error('Invalid URL. Please enter a YouTube video URL.');
+      return;
     }
 
     console.log('videoId: ', videoId);
@@ -83,7 +88,9 @@ const NewVideo = ({ setTitle, setSummary }) => {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
-      setSummary((prev) => prev + chunkValue);
+
+      // Append each new chunk to the summary using function version of setSummary
+      setSummary((prevSummary) => prevSummary + chunkValue);
     }
 
     setIsLoading(false);
@@ -91,12 +98,13 @@ const NewVideo = ({ setTitle, setSummary }) => {
 
   return (
     <div className='flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen'>
-      <Head>
-        <title>YouTubeGPT</title>
-        <link rel='icon' href='/favicon.ico' />
-      </Head>
       <Header />
       <main className='flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-20 sm:mt-5'>
+        <Toaster
+          position='top-center'
+          reverseOrder={false}
+          toastOptions={{ duration: 2000 }}
+        />
         <h1 className='sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900 mb-10'>
           Generate summary and chat with YouTube videos
         </h1>

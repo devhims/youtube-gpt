@@ -1,15 +1,6 @@
 import { supabaseClient } from '@/lib/Supabase';
 import count from 'word-count';
-import { OpenAIStream } from '@/utils/OpenAIStream';
-import GPT3Tokenizer from 'gpt3-tokenizer';
-import { Configuration, OpenAIApi } from 'openai';
 import { getSubtitles } from 'youtube-caption-extractor';
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openai = new OpenAIApi(configuration);
 
 // character chunk size
 const docSize = 5000;
