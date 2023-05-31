@@ -1,38 +1,107 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# YouTubeGPT
+
+This project is a dynamic web application that generates summaries of YouTube videos and allows you to chat with the video content. This is done by leveraging the power of OpenAI's GPT model for natural language understanding and generation, as well as the speed and flexibility of Supabase for vector database management.
+
+![YouTubeGPT Demo](/public/youtubegptdemo.gif)
+
+## Table of Contents
+
+- [YouTubeGPT](#youtubegpt)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+  - [Usage](#usage)
+  - [Deployment](#deployment)
+  - [Built With](#built-with)
+  - [Contributing](#contributing)
+  - [License](#license)
+  - [Contact](#contact)
+  - [Acknowledgements](#acknowledgements)
+
+## Features
+
+- Automatic video summary generation.
+- Interactive chat with the video content.
+- Responsive and modern user interface.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+- [Node.js](https://nodejs.org/en/)
+- [npm](https://www.npmjs.com/)
+- An [OpenAI](https://openai.com/) account for API key
+- A [Supabase](https://supabase.io/) account for database management
+
+### Installation
+
+1. Clone the repository
+
+```sh
+git clone https://github.com/devhims/youtube-gpt
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install NPM packages
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```sh
+npm install
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+3.  Create a `.env.local` file in the root directory with your OpenAI, Supabase, and YouTube API credentials:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```sh
+YOUTUBE_API_KEY=your_youtube_api_key
+SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+OPENAI_API_KEY=your_openai_api_key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+4. Run the development server
 
-## Learn More
+```sh
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To generate a summary for a video, paste the YouTube video URL and select the desired summary length. Once the summary is generated, you can engage in an interactive chat with the video content.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+The application is deployed on [Vercel](https://vercel.com). If you want to deploy it on your own, follow the [Vercel Deployment Documentation](https://vercel.com/docs).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Built With
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [React](https://reactjs.org/)
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [OpenAI API](https://openai.com/)
+- [Supabase](https://supabase.io/)
+
+## Contributing
+
+Any contributions are greatly appreciated.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+Himanshu Gupta - thinktank.himanshu@gmail.com
+
+Project Link: [https://github.com/devhims/youtube-gpt](https://github.com/devhims/youtube-gpt)
+
+## Acknowledgements
+
+- [OpenAI](https://openai.com/)
+- [Supabase](https://supabase.io/)
+- [Vercel](https://vercel.com)
