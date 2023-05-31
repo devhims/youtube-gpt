@@ -52,7 +52,7 @@ npm install
 3.  Create a `.env.local` file in the root directory with your OpenAI, Supabase, and YouTube API credentials:
 
 ```sh
-YOUTUBE_API_KEY=your_youtube_api_key
+YOUTUBE_API_KEY=your_youtube_api_key_from_google_cloud_console
 SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 OPENAI_API_KEY=your_openai_api_key
